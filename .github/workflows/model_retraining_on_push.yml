@@ -28,11 +28,21 @@ jobs:
 
       - name: Train model
         run: |
-          python src/train_model.py --data_path data/dataset.csv --target "Spending Score (1-100)"
+          TS=$(date +%Y%m%d_%H%M%S)
+          echo "Using timestamp: $TS"
+          python src/train_model.py \
+            --data_path data/dataset.csv \
+            --target "Spending Score (1-100)" \
+            --timestamp "$TS"
 
       - name: Evaluate model
         run: |
-          python src/evaluate_model.py --data_path data/dataset.csv --target "Spending Score (1-100)"
+          TS=$(date +%Y%m%d_%H%M%S)
+          echo "Using timestamp: $TS"
+          python src/evaluate_model.py \
+            --data_path data/dataset.csv \
+            --target "Spending Score (1-100)" \
+            --timestamp "$TS"
 
       - name: Commit models & metrics
         run: |
