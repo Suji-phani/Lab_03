@@ -1,0 +1,43 @@
+name: Model Retraining on Push
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Train model
+        run: |
+          python src/train_model.py --data_path data/dataset.csv --target "Spending Score (1-100)"
+
+      - name: Evaluate model
+        run: |
+          python src/evaluate_model.py --data_path data/dataset.csv --target "Spending Score (1-100)"
+
+      - name: Commit models & metrics
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "github-actions[bot]"
+          git add models metrics || true
+          git commit -m "CI: add model and metrics" || echo "No changes to commit"
+          git push
